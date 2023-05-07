@@ -1,0 +1,62 @@
+const router = require("express").Router();
+const connection = require("../db/connection");
+const { body, validationResult } = require("express-validator");
+const util = require("util");
+const bcrypt = require("bcrypt");
+const crypto = require("crypto");
+// Get all users
+router.get("/", (req, res) => {
+  try {
+    connection.query("SELECT * FROM user", (error, rows, fields) => {
+      return res.json(rows);
+    });
+  } catch (err) {
+    console.error(err);
+    return res.sendStatus(500);
+  }
+});
+
+
+
+// Update a user by ID
+router.put(
+  "/:Id",
+  body("Name").notEmpty().withMessage("Name is required"),
+  body("Email").isEmail().withMessage("Invalid Email"),
+  body("Phone").isMobilePhone().withMessage("Invalid Phone number"),
+  body("Password")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters long"),
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const { Name, Email, Phone, Password } = req.body;
+    try {
+      // Hash the Password.
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(Password, saltRounds);
+      // Generate random token for Email verification.
+      const verificationToken = crypto.randomBytes(20).toString("hex");
+      // Update the user.
+      await util
+        .promisify(connection.query)
+        .call(
+          connection,
+          "UPDATE user SET Name = ?, Email = ?, Password = ?, Phone = ?, verification_token = ? WHERE Id = ?",
+          [Name, Email, hashedPassword, Phone, verificationToken, req.params.Id]
+        );
+      return res.status(200).json({ msg: "User updated" });
+    } catch (err) {
+      console.error(err);
+      return res
+        .status(500)
+        .json({ errors: [{ msg: "Internal Server error" }] });
+    }
+  }
+);
+
+// Delete a user by ID
+
+module.exports = router;

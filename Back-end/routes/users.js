@@ -64,27 +64,31 @@ class UserController {
 
   async getUserByIdFromDb(id) {
     const query = "SELECT * FROM user WHERE Id = ?";
-    const rows = await util.promisify(connection.query).bind(connection, query, [id]);
+    const rows = await util
+      .promisify(connection.query)
+      .bind(connection, query, [id]);
     return rows;
   }
 
   async updateUser(req, res) {
-    const id = req.params.Id;
+    const Id = req.params.Id;
     const { Name, Email, Phone, Password } = req.body;
     try {
       await this.validateUserUpdate(req);
-      await this.updateUserInDb(id, Name, Email, Phone, Password);
-      res.status(200).json({ msg: "User updated" });
+      await this.updateUserInDb(Id, Name, Email, Phone, Password);
+      res.status(200).json({ message: "User updated" });
     } catch (error) {
       console.error(error);
       res.status(400).json({ errors: [{ msg: "Bad Request" }] });
     }
   }
-
   async validateUserUpdate(req) {
     await body("Name").notEmpty().withMessage("Name is required").run(req);
     await body("Email").isEmail().withMessage("Invalid Email").run(req);
-    await body("Phone").isMobilePhone().withMessage("Invalid Phone number").run(req);
+    await body("Phone")
+      .isMobilePhone()
+      .withMessage("Invalid Phone number")
+      .run(req);
     await body("Password")
       .isLength({ min: 6 })
       .withMessage("Password must be at least 6 characters long")
@@ -95,18 +99,29 @@ class UserController {
     }
   }
 
-  async updateUserInDb(id, name, email, phone, password) {
-    const query =
-      "UPDATE user SET Name = ?, Email = ?, Phone = ?, Password = ? WHERE Id = ?";
+  async updateUserInDb(Id, Name, Email, Phone, Password) {
+    
+    const query = "UPDATE user SET Name = ?, Email = ?, Phone = ?, Password = ?, verification_token = ? WHERE Id = ?";
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const hashedPassword = await bcrypt.hash(Password, saltRounds);
     const verificationToken = crypto.randomBytes(20).toString("hex");
-    await util.promisify(connection.query).bind(connection, query, [
-      name,
-      email,
-      phone,
+    await util
+      .promisify(connection.query)
+      .call(connection, query, [
+        Name,
+        Email,
+        Phone,
+        hashedPassword,
+        verificationToken,
+        Id,
+      ]);
+    console.log([
+      Name,
+      Email,
+      Phone,
       hashedPassword,
-      id,
+      verificationToken,
+      Id,
     ]);
   }
 
@@ -127,7 +142,9 @@ class UserController {
 
   async deleteUserFromDb(id) {
     const query = "DELETE FROM user WHERE Id = ?";
-    const result = await util.promisify(connection.query).bind(connection, query, [id]);
+    const result = await util
+      .promisify(connection.query)
+      .bind(connection, query, [id]);
     return result;
   }
 }

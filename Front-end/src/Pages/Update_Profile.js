@@ -32,7 +32,8 @@ const ProfileUpdateForm = () => {
         setUpdates({
           ...update,
         });
-        alert(res.data.msg);
+        alert(res.data.message
+          );
       })
       .catch((error) => {
         // handle error
