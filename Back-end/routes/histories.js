@@ -1,3 +1,5 @@
+const router = require("express").Router();
+const connection = require("../db/connection");
 class HistoryController {
   constructor(connection) {
     this.connection = connection;
@@ -97,4 +99,11 @@ class HistoryController {
   };
 }
 
-module.exports = new HistoryController;
+const historyController = new HistoryController(connection);
+router.get("/", historyController.getAllHistories);
+router.get("/:Email", historyController.getHistoryById);
+router.post("/", historyController.createHistory);
+router.put("/:Id", historyController.updateHistoryById);
+router.delete("/:Id", historyController.deleteHistoryById);
+
+module.exports = router;
