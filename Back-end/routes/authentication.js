@@ -30,13 +30,8 @@ class UserController {
             return res.status(202).json({
               errors: [
                 {
-                  msg: "User already exists with the given Email or Phone number",
-                },
-              ],
-            });
-          }
-
-          const saltRounds = 10;
+                  msg: "User already exists with the given Email or Phone number", },  ], });  }
+  const saltRounds = 10;
           const hashedPassword = await bcrypt.hash(Password, saltRounds);
 
           const verificationToken = crypto.randomBytes(20).toString("hex");
@@ -55,19 +50,11 @@ class UserController {
               [Name, Email, Phone, hashedPassword, verificationToken, Status]
             );
             res.status(200).json({
-              message:
-                "The user was added to the queue, please Wait for Admin To Confirm",
-            });
-          }
+              message:    "The user was added to the queue, please Wait for Admin To Confirm",   }); }
         } catch (error) {
           console.error(error);
-          res.status(500).json({ errors: [{ msg: "Internal server error" }] });
-        }
-      },
-    ];
-  }
-
-  async checkUserExists(email, phone) {
+          res.status(500).json({ errors: [{ msg: "Internal server error" }] });  } }, ];}
+ async checkUserExists(email, phone) {
     const query = "SELECT Id FROM user WHERE Email = ? OR Phone = ?";
     const rows = await util.promisify(connection.query).call(connection, query, [
       email,
@@ -75,13 +62,11 @@ class UserController {
     ]);
     return rows.length > 0;
   }
-
   async insertUser(table, values) {
     const query = `INSERT INTO ${table} (Name, Email, Phone, Password, verification_token, Status) VALUES (?, ?, ?, ?, ?, ?)`;
     await util.promisify(connection.query).call(connection, query, values);
   }
-
-  async login(req, res) {
+ async login(req, res) {
     const { Email, Password } = req.body;
 
     if (!Email || !Password) {
@@ -89,23 +74,23 @@ class UserController {
         .status(400)
         .json({ errors: [{ msg: "Email and password are required" }] });
     }
-
-    try {
+try {
       const user = await this.getUser(Email);
 
       if (!user) {
         return res
           .status(401)
-          .json({ errors: [{ msg: "Your Email does not exist in database." }] });
-      }
-
-      if (user.Status === 0) {
-        return res.status(401).json({
-          errors: [{ msg: "Your Email does not confirm by the admin yet." }],
-        });
-      }
-
-      const passwordMatch = await bcrypt.compare(Password, user.Password);
+          .json({ errors: [{ msg: "Your Email does not exist in database." }] });  }
+          const queryOnUserQueue = "SELECT * FROM user_queue WHERE Email = ?";
+          const rowsFromUserQueue = await util
+            .promisify(connection.query)
+            .call(connection, queryOnUserQueue, [Email]);
+          if (rowsFromUserQueue.length) {
+            return res.status(401).json({
+              errors: [{ msg: "Your Email does not confirm by the admin yet." }],
+            });
+          }
+  const passwordMatch = await bcrypt.compare(Password, user.Password);
       if (!passwordMatch) {
         return res.status(401).json({
           errors: [

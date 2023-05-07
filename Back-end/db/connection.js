@@ -1,10 +1,12 @@
 const mysql = require("mysql");
+const util = require("util");
 const connection = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "",
   database: "earysystem",
   port: "3306",
+ 
 });
 connection.connect((err) => {
   if (err) {
@@ -14,4 +16,9 @@ connection.connect((err) => {
     console.log("connection established");
   }
 });
-module.exports = connection;
+
+connection.config.typeCast = true; // Add this line
+
+const query = util.promisify(connection.query).bind(connection);
+
+module.exports = { connection, query };
