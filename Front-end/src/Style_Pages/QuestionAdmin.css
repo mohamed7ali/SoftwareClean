@@ -1,0 +1,76 @@
+:root{
+    --violete: rgb(55, 2, 104)
+    }
+  
+.tableAdmin {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 50px;
+  }
+
+  .thAdmin, .tdAdmin {
+    padding: 7px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+
+  .thAdmin {
+    background-color: #f2f2f2;
+    color:var(--violete);
+    font-size: larger;
+  }
+
+  .trAdmin:nth-child(even) {
+    background-color: #f9f9f9;
+    color: black;
+    font-weight: bold;
+    font-size: 15px;
+  }
+
+  .trAdmin:nth-child(odd) {
+    
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+  }
+  .show{
+    background-color: #b1a0a0;
+    color: black;
+    border-radius: 4px;
+    font-weight: 600;
+    width: 50px;
+   
+  }
+  .btn3{
+    display: inline-block;
+  }
+
+  @media (max-width: 767px) {
+    /* Responsive styles for smaller screens */
+    th, td {
+      display: block;
+      width: 100%;
+      text-align: center;
+    }
+
+    th {
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
+  }
+
+  .table_container{
+    display:flex;
+    justify-content: center;
+    align-items:center;
+    margin-top: 20px;
+    height: 100vh;
+  }
+
+
+
+  

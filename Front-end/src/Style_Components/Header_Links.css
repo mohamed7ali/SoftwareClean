@@ -1,0 +1,19 @@
+.link{
+    
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+    margin-top: 20px;
+    border-radius: 5px;
+    text-align: left;
+    margin-right: 70px;
+    padding: 5px;
+  }
+
+  .link:hover{
+    transition: all 0.3s ease-in-out;
+    background-color: white;
+    color:var(--violete) ;
+    border-top-right-radius: 15px;
+    border-top-left-radius: 15px;
+  }

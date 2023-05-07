@@ -1,0 +1,67 @@
+body {
+    background: linear-gradient(-45deg, #070872, #653b88, #690650, #0665b3, #09c9e2);
+    background-size: 400% 400%;
+    animation: gradient 9s ease infinite;
+  }
+  
+  @keyframes gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+  
+
+.instructions {
+margin-top: 40px;
+border: 1px solid darkslategrey;
+border-radius: 5px;
+
+align-items: center;
+
+background-color: white;
+height: 990px;
+padding: 20px;
+margin-bottom: 40px;
+}
+.instructions h1{
+    text-align: center;
+    color: #e8efed;
+    font-family: "Times New Roman", Times, serif;
+    padding-bottom: 10px;
+    
+}
+.p1{
+    color: #ece6f5;
+    font-family: Arial, Helvetica, sans-serif;
+    padding-bottom: 10px;
+    font-size: 20px;
+}
+.browser-default{
+    color: #faf6ff;
+    font-family: Arial, Helvetica, sans-serif;
+    padding-bottom: 10px;
+    font-size: 20px;
+    margin-left: 300px;
+}
+
+.instructions h2{
+    color: #d9e9e4;
+    display: inline-block;
+    
+}
+.exm{
+    color: #e0dce5;
+    font-size: 20px;
+    
+   
+    text-decoration: none;
+}
+.exm :hover{
+    color: #daceeb;
+}
