@@ -1,131 +1,156 @@
-const router = require("express").Router();
-const connection = require("../db/connection");
+const express = require("express");
+const {connection }= require("../db/connection");
 const util = require("util");
-const query = util.promisify(connection.query).bind(connection);
 
-// Route to fetch 5 quizies from data
-router.get("/", async (req, res) => {
-  try {
-    // Fetch five random quiz questions with answers from the database
-    const rows = await query(
-      "SELECT * FROM exam_question ORDER BY RAND() LIMIT 5"
-    );
-
-    // Send the quiz data as JSON
-    res.json(rows);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to fetch quiz data" });
+class QuizController {
+  async getQuizQuestions(req, res) {
+    try {
+      const rows = await this.getRandomQuizQuestions(5);
+      res.json(rows);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to fetch quiz data" });
+    }
   }
-});
 
-// Insert a new question
-router.post("/", async (req, res) => {
-  const { Audio, Question, Ans_1, Ans_2, Ans_3, Ans_4, Correct } = req.body;
-  console.log(Audio);
-  try {
-    await query(
-      "INSERT INTO exam_question set ?",
-      {
-        Audio: Audio,
-        Question: Question,
-        Ans_1: Ans_1,
-        Ans_2: Ans_2,
-        Ans_3: Ans_3,
-        Ans_4: Ans_4,
-        Correct: Correct,
-      },
-      (err, result, fields) => {
-        res
-          .status(201)
-          .json({ message: "The question was added successfully." });
+  async getRandomQuizQuestions(limit) {
+    const query = "SELECT * FROM exam_question ORDER BY RAND() LIMIT ?";
+    const rows = await util.promisify(connection.query).bind(connection, query, [limit]);
+    return rows;
+  }
+
+  async getAllQuizQuestions(req, res) {
+    try {
+      const rows = await this.getAllQuestions();
+      res.json(rows);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to fetch quiz data" });
+    }
+  }
+
+  async getAllQuestions() {
+    const query = "SELECT * FROM exam_question";
+    const rows = await util.promisify(connection.query).bind(connection, query);
+    return rows;
+  }
+
+  async getQuizQuestionById(req, res) {
+    try {
+      const id = req.params.Id;
+      const rows = await this.getQuestionById(id);
+      if (rows.length === 0) {
+        res.sendStatus(404);
+      } else {
+        res.json(rows[0]);
       }
-    );
-  } catch (err) {
-    console.error(err);
-    res.sendStatus(500);
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500);
+    }
   }
-});
 
-// Route to fetch all quizies from data
-router.get("/all", async (req, res) => {
-  try {
-    // Fetch five random quiz questions with answers from the database
-    const rows = await query("SELECT * FROM exam_question");
-
-    // Send the quiz data as JSON
-    res.json(rows);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to fetch quiz data" });
+  async getQuestionById(id) {
+    const query = "SELECT * FROM exam_question WHERE ?";
+    const rows = await util.promisify(connection.query).bind(connection, query, [{ Id: id }]);
+    return rows;
   }
-});
-// Retrieve a single quiz by ID
-router.get("/:Id", (req, res) => {
-  try {
-    const Id = req.params.Id;
-    connection.query(
-      "SELECT * FROM exam_question WHERE ?",
-      { Id: Id },
-      (error, rows, fields) => {
-        if (error) {
-          console.error(error);
-          res.sendStatus(500);
-        } else if (rows.length === 0) {
-          res.sendStatus(404);
-        } else {
-          res.json(rows[0]);
-        }
+
+  async addQuizQuestion(req, res) {
+    const { Audio, Question, Ans_1, Ans_2, Ans_3, Ans_4, Correct } = req.body;
+    try {
+      await this.insertQuestion(Audio, Question, Ans_1, Ans_2, Ans_3, Ans_4, Correct);
+      res.status(201).json({ message: "The question was added successfully." });
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500);
+    }
+  }
+
+  async insertQuestion(audio, question, ans1, ans2, ans3, ans4, correct) {
+    const query = "INSERT INTO exam_question SET ?";
+    await util.promisify(connection.query).bind(connection, query, {
+      Audio: audio,
+      Question: question,
+      Ans_1: ans1,
+      Ans_2: ans2,
+      Ans_3: ans3,
+      Ans_4: ans4,
+      Correct: correct,
+    });
+  }
+
+  async updateQuizQuestion(req, res) {
+    const { Audio, Question, Ans_1, Ans_2, Ans_3, Ans_4, Correct } = req.body;
+    try {
+      const id = req.params.Id;
+      const result = await this.updateQuestionById(id, Audio, Question, Ans_1, Ans_2, Ans_3, Ans_4, Correct);
+      if (result.affectedRows === 0) {
+        res.sendStatus(404);
+      } else {
+        res.status(202).json({ message: "Question updated" });
       }
-    );
-  } catch (err) {
-    console.error(err);
-    res.sendStatus(500);
-  }
-});
-
-
-
-// Update a question by ID
-router.put("/:Id", (req, res) => {
-  const { Audio, Question, Ans_1, Ans_2, Ans_3, Ans_4, Correct } = req.body;
-  try {
-    connection.query(
-      "UPDATE exam_question SET Audio = ?, Question = ?, Ans_1 = ?, Ans_2 = ?, Ans_3 = ?, Ans_4 = ?, Correct = ? WHERE Id = ?",
-      [Audio, Question, Ans_1, Ans_2, Ans_3, Ans_4, Correct, req.params.Id],
-      (err, result, fields) => {
-        if (result.affectedRows === 0) {
-          res.sendStatus(404);
-        } else {
-          res.status(202).json({ message: "Question updated" });
-        }
-      }
-    );
-  } catch (err) {
-    console.error(err);
-    res.sendStatus(500);
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500);
+    }
   }
-});
 
-// Delete a question by ID
-router.delete("/:Id", (req, res) => {
-  try {
-    const id = req.params.Id;
-    connection.query(
-      "DELETE FROM exam_question WHERE Id = ?",
-      [id],
-      (err, result, fields) => {
-        if (result.affectedRows === 0) {
-          res.sendStatus(404);
-        } else {
-          res.status(202).json({ message: "question deleted successfully" });
-        }
-      }
-    );
-  } catch (err) {
-    console.error(err);
-    res.sendStatus(500);
+  async updateQuestionById(id, audio, question, ans1, ans2, ans3, ans4, correct) {
+    const query =
+      "UPDATE exam_question SET Audio = ?, Question = ?, Ans_1 = ?, Ans_2 = ?, Ans_3 = ?, Ans_4 = ?, Correct = ? WHERE Id = ?";
+    const result = await util.promisify(connection.query).bind(connection, query, [
+      audio,
+      question,
+      ans1,
+      ans2,
+      ans3,
+      ans4,
+      correct,
+      id,
+    ]);
+    return result;
   }
-});
+
+  async deleteQuizQuestion(req, res) {
+    try {
+      const id = req.params.Id;
+      const result = await this.deleteQuestionById(id);
+      if (result.affectedRows === 0) {
+        res.sendStatus(404);
+      } else {
+        res.status(202).json({ message: "Question deleted successfully" });
+      }
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500);
+    }
+  }
+
+  async deleteQuestionById(id) {
+    const query = "DELETE FROM exam_question WHERE Id = ?";
+    const result = await util.promisify(connection.query).bind(connection, query, [id]);
+    return result;
+  }
+}
+
+const quizController = new QuizController();
+const router = express.Router();
+
+router.get("/", quizController.getQuizQuestions.bind(quizController));
+router.post("/", quizController.addQuizQuestion.bind(quizController));
+router.get("/all", quizController.getAllQuizQuestions.bind(quizController));
+router.get("/:Id", quizController.getQuizQuestionById.bind(quizController));
+router.put("/:Id", quizController.updateQuizQuestion.bind(quizController));
+router.delete("/:Id", quizController.deleteQuizQuestion.bind(quizController));
 
 module.exports = router;
+/**I created a QuizController class that contains the CRUD operations for
+ *  quiz questions. I extracted the database operations
+ *  to separate methods and used async/await instead
+ *  of callbacks to handle asynchronous operations.
+ *  I also added descriptive method names and parameter 
+ * names to improve readability.
+
+I used bind() to bind the quizController instance to
+ the route handlers, which makes the code more concise and readable. */

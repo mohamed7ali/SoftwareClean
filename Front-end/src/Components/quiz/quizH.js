@@ -1,32 +1,17 @@
 import React, { useState, useEffect } from "react";
-<<<<<<< Updated upstream
 import "../../Style_Pages/Quiz.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ReactAudioPlayer from "react-audio-player";
-=======
-import '../../Style_Pages/Quiz.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import ReactAudioPlayer from 'react-audio-player';
->>>>>>> Stashed changes
 import Header from "../Header";
 import Button from "../Button";
 import One from '../../Style_Pages/sound/1.mp3';
 import axios from "axios";
 import { getAuthUser } from "../../helper/storage";
 
-<<<<<<< Updated upstream
 export function Quizh() {
   let degree = 0;
-=======
-import axios from "axios";
-
-
-export function Quizh() {
->>>>>>> Stashed changes
   const auth = getAuthUser();
-  const [currentQuestion, setCurrentQuestion] = useState(0)
 
-<<<<<<< Updated upstream
   const [showFinalResults, setFinalResults] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
@@ -96,55 +81,16 @@ export function Quizh() {
       setCurrentQuestion(currentQuestion + 1);
     } else {
       setFinalResults(true);
-=======
-  //let {email}=auth.data.email;
-
-  console.log(auth.email)
-  const [exams, setExam] = useState({
-    loading: true,
-    results: [],
-    err: null,
-    reload: 0,
-  });
-
-  useEffect(() => {
-    setExam({ ...exams, loading: true });
-    axios
-      .get("http://localhost:4000/quizzes")
-      .then((resp) => {
-        setExam({ ...exams, results: resp.data, loading: false, err: null });
-        console.log(resp);
-      })
-      .catch((err) => {
-        setExam({
-          ...exams,
-          loading: false,
-          err: " something went wrong, please try again later ! ",
-        });
-      });
-  }, [exams.reload]);
-
-  //const [showFinalResults,setFinalResults]=useState(false);
-  // const [currentQuestion,setCurrentQuestion]=useState(0);
-  // const [score, setScore] = useState(0);
-
-  const optionClicked = () => {
-
-    console.log("hello", exams.results.length);
-    if (currentQuestion + 1 < exams.results.length) {
-      setCurrentQuestion(currentQuestion + 1);
-
->>>>>>> Stashed changes
     }
     console.log(degree);
   };
 
   /* Resets the game back to default */
-  //const restartQuiz = () => {
-  //  setScore(0);
-  //  setCurrentQuestion(0);
-  //  setFinalResults(false);
-  // };
+  const restartQuiz = () => {
+    setScore(0);
+    setCurrentQuestion(0);
+    setFinalResults(false);
+  };
 
   return (
     <>
@@ -153,7 +99,6 @@ export function Quizh() {
       <div className="quiz ">
         <h1>Eary Test</h1>
 
-<<<<<<< Updated upstream
         <h2 className="score">Score: {score}</h2>
 
         {showFinalResults ? (
@@ -244,73 +189,3 @@ export function Quizh() {
     </>
   );
 }
-=======
-  return (
-
-    <>
-      <Header />
-      {exams.loading === true && (
-        <h1>still loading</h1>
-      )}
-      <div className="quiz ">
-        <h1 >Eary Test</h1>
-
-
-        <div className="question-card ">
-
-
-          {exams.loading === false && exams.err == null&&(
-            <>
-              <h2 >Question {currentQuestion + 1} out of {exams.results.length}</h2><br /><br />
-              <ReactAudioPlayer
-                src={exams.results[currentQuestion].Audio}
-                autoPlay
-                controls
-              />
-              <br /><br />
-              <h3 className="question-text">{exams.results[currentQuestion].Question}</h3>
-              <ul className="ul1">
-
-                <li className="li1"
-                  onClick={() => optionClicked()} >
-                  {exams.results[currentQuestion].Ans_1}
-                </li>
-                <li className="li1"
-                  onClick={() => optionClicked()} >
-                  {exams.results[currentQuestion].Ans_2}
-                </li>
-                <li className="li1"
-                  onClick={() => optionClicked()} >
-                  {exams.results[currentQuestion].Ans_3}
-                </li>
-                <li className="li1"
-                  onClick={() => optionClicked()} >
-                  {exams.results[currentQuestion].Ans_4}
-                </li>
-              </ul></>
-
-          )}
-
-
-
-
-          {auth.status === 1 && (
-            <>
-              <div className="btn1" style={{ backgroundColor: "rgb(248, 243, 243)" }}>
-                <Button name={'Edit'} go_to={'/edit'} />
-                <Button name={'Delete'} go_to={''} />
-
-              </div>
-            </>
-          )}
-        </div>
-
-
-      </div>
-    </>
-
-  );
-
-
-}
->>>>>>> Stashed changes

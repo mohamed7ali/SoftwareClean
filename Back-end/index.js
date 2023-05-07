@@ -28,11 +28,7 @@ const checkContactMessage = require("./middleware/checkContactMessage");
 
 // ==================API ROUTES [ENDPOINTS]=================
 app.use("/admins", admin);
-<<<<<<< Updated upstream
 app.use("/quizzes",  examQuestions);
-=======
-app.use("/quizzes", examQuestions);
->>>>>>> Stashed changes
 app.use("/users", user);
 app.use("/newUsers", checkUserStatus, userQueue);
 app.use("/histories", history);
