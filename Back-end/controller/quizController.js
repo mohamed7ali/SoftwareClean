@@ -1,21 +1,24 @@
 const connection = require("../db/connection");
 
 class ExamQuestion {
+  constructor(table) {
+    this.table = table;
+  }
+
   async getAll() {
     try {
-      const rows = await connection.query("SELECT * FROM exam_question");
+      const rows = await connection.query(`SELECT * FROM ${this.table}`);
       return rows;
     } catch (error) {
       console.error(error);
       throw new Error("Failed to fetch exam questions");
     }
   }
- 
 
   async getById(id) {
     try {
       const rows = await connection.query(
-        "SELECT * FROM exam_question WHERE Id = ?",
+        `SELECT * FROM ${this.table} WHERE Id = ?`,
         [id]
       );
       if (rows.length === 0) {
@@ -31,7 +34,7 @@ class ExamQuestion {
   async add(data) {
     const { Audio, Question, Ans_1, Ans_2, Ans_3, Ans_4, Correct } = data;
     try {
-      await connection.query("INSERT INTO exam_question SET ?", {
+      await connection.query(`INSERT INTO ${this.table} SET ?`, {
         Audio,
         Question,
         Ans_1,
@@ -50,7 +53,7 @@ class ExamQuestion {
     const { Audio, Question, Ans_1, Ans_2, Ans_3, Ans_4, Correct } = data;
     try {
       const result = await connection.query(
-        "UPDATE exam_question SET Audio = ?, Question = ?, Ans_1 = ?, Ans_2 = ?, Ans_3 = ?, Ans_4 = ?, Correct = ? WHERE Id = ?",
+        `UPDATE ${this.table} SET Audio = ?, Question = ?, Ans_1 = ?, Ans_2 = ?, Ans_3 = ?, Ans_4 = ?, Correct = ? WHERE Id = ?`,
         [Audio, Question, Ans_1, Ans_2, Ans_3, Ans_4, Correct, id]
       );
       if (result.affectedRows === 0) {
@@ -60,14 +63,12 @@ class ExamQuestion {
       console.error(error);
       throw new Error("Failed to update exam question");
     }
-  } 
-  
-
+  }
 
   async delete(id) {
     try {
       const result = await connection.query(
-        "DELETE FROM exam_question WHERE Id = ?",
+        `DELETE FROM ${this.table} WHERE Id = ?`,
         [id]
       );
       if (result.affectedRows === 0) {

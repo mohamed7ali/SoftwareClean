@@ -1,9 +1,15 @@
 const ExamQuestion = require("../../controller/quizController");
 
-async function getQuizQuestions(req, res,id) {
+class ExtendedExamQuestion extends ExamQuestion {
+  constructor() {
+    super("exam_question");
+  }
+}
+
+async function getQuizQuestions(req, res) {
   try {
     const id = req.params.Id;
-    const examQuestion = new ExamQuestion();
+    const examQuestion = new ExtendedExamQuestion();  // Use the extended class here
     const rows = await examQuestion.getById(id);
     res.json(rows);
   } catch (error) {

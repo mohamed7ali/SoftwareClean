@@ -34,28 +34,18 @@ class AuthController {
             });
           }
 
-  const saltRounds = 10;
+          const saltRounds = 10;
           const hashedPassword = await bcrypt.hash(Password, saltRounds);
 
           const verificationToken = crypto.randomBytes(20).toString("hex");
 
-          if (Status) {
-            await this.insertUser(
-              "user",
-              [Name, Email, Phone, hashedPassword, verificationToken, Status]
-            );
-            res.status(200).json({
-              message: "The Admin was added to the table.",
-            });
-          } else {
-            await this.insertUser(
-              "user_queue",
-              [Name, Email, Phone, hashedPassword, verificationToken, Status]
-            );
-            res.status(200).json({
-              message: "The user was added to the queue, please Wait for Admin To Confirm",
-            });
-          }
+          const table = Status ? "user" : "user_queue";
+          const values = [Name, Email, Phone, hashedPassword, verificationToken, Status];
+
+          await this.insertUser(table, values);
+
+          const message = Status ? "The Admin was added to the table." : "The user was added to the queue, please Wait for Admin To Confirm";
+          res.status(200).json({ message });
         } catch (error) {
           console.error(error);
           res.status(500).json({ errors: [{ msg: "Internal server error" }] });
@@ -89,10 +79,9 @@ class AuthController {
     }
 
     try {
-      // QUERY ON USER TABLE
-      const rowFromUser = await this.getUserByEmail(Email);
-      // QUERY ON USER_QUEUE TABLE
-      const rowsFromUserQueue = await this.getUserQueueByEmail(Email);
+      const rowFromUser = await this.getUserByEmail("user", Email);
+      const rowsFromUserQueue = await this.getUserByEmail("user_queue", Email);
+
       if (rowsFromUserQueue.length) {
         return res.status(401).json({
           errors: [{ msg: "Your Email does not confirm by the admin yet." }],
@@ -115,32 +104,16 @@ class AuthController {
         });
       }
 
-      const token = user.verification_token;
-
-      res.json({
-        msg: "login successfully",
-        token: token,
-        name: user.Name,
-        id: user.Id,
-        status: user.Status,
-        Email: user.Email,
-      });
+      const { verification_token, Name, Id, Status } = user;
+      res.json({ msg: "login successfully", token: verification_token, name: Name, id: Id, status: Status, Email });
     } catch (err) {
       console.log(err);
       res.status(500).json({ errors: [{ msg: "Server error" }] });
     }
   }
 
-  async getUserByEmail(email) {
-    const query = "SELECT * FROM user WHERE Email = ?";
-    const rows = await util
-      .promisify(connection.query)
-      .call(connection, query, [email]);
-    return rows;
-  }
-
-  async getUserQueueByEmail(email) {
-    const query = "SELECT * FROM user_queue WHERE Email = ?";
+  async getUserByEmail(table, email) {
+    const query = `SELECT * FROM ${table} WHERE Email = ?`;
     const rows = await util
       .promisify(connection.query)
       .call(connection, query, [email]);

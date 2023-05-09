@@ -1,8 +1,12 @@
 const ExamQuestion = require("../../controller/quizController");
-
+class ExtendedExamQuestion extends ExamQuestion {
+  constructor() {
+    super("exam_question");
+  }
+}
 async function addQuizQuestion(req, res) {
   try {
-    const examQuestion = new ExamQuestion();
+    const examQuestion = new ExtendedExamQuestion();
     await examQuestion.add(req.body);
     res
       .status(201)
