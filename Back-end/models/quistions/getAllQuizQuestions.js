@@ -1,4 +1,4 @@
-const ExamQuestion = require("../../routes/examQuestions");
+const ExamQuestion = require("../../controller/quizController");
 
 async function getAllQuizQuestions(req, res) {
   try {

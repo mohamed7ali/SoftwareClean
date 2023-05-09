@@ -21,7 +21,7 @@ export function QuestionsAdmin (){
 
   useEffect(() => {
     axios
-      .get(`http://localhost:4000/quizzes/`)
+      .get(`http://localhost:4000/quizzes/all`)
       .then((res) => {
         setUsersArray(res.data);
         usersArray.push(res.data)

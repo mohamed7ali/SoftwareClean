@@ -65,7 +65,7 @@ export const EditQuestion = () => {
     axios
       .get("http://localhost:4000/quizzes/" + id)
       .then((resp) => {
-        console.log(resp);
+        console.log("hat data",resp);
         setQuestion({
           ...question,
           Audio: resp.data.Audio,
@@ -74,6 +74,7 @@ export const EditQuestion = () => {
           Ans_2:resp.data.Ans_2,
           Ans_3:resp.data.Ans_3,
           Ans_4:resp.data.Ans_4,
+          Correct:resp.Correct,
         });
       })
       .catch((err) => {

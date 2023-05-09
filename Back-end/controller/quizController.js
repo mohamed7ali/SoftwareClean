@@ -10,6 +10,7 @@ class ExamQuestion {
       throw new Error("Failed to fetch exam questions");
     }
   }
+ 
 
   async getById(id) {
     try {
@@ -59,7 +60,9 @@ class ExamQuestion {
       console.error(error);
       throw new Error("Failed to update exam question");
     }
-  }
+  } 
+  
+
 
   async delete(id) {
     try {

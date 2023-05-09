@@ -4,7 +4,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import ReactAudioPlayer from "react-audio-player";
 import Header from "../Header";
 import Button from "../Button";
-import One from '../../Style_Pages/sound/1.mp3';
 import axios from "axios";
 import { getAuthUser } from "../../helper/storage";
 
@@ -102,18 +101,28 @@ export function Quizh() {
         <h2 className="score">Score: {score}</h2>
 
         {showFinalResults ? (
-          <div className="final-result" onClick={PostHistory}>
+          <>
+                    <div style={{paddingBottom:50}} className="final-result" onClick={PostHistory}>
             <h1>Final Result</h1>
             <h2>
+            
               {score} out of {exams.results.length} correct -(
               {(score / exams.results.length) * 100}%)
+              
             </h2>
-
-            <button className="btn2" onClick={() => restartQuiz()}>
-              Restart Quiz
-            </button>
+           <dev className="devResult" > Save To History</dev>
+           {/* <button className="btn2" style={{marginLeft:480,marginTop:20}}  onClick={PostHistory}>
+              Save To History
+            </button> */}
+           
+          
 
           </div>
+           <button className="btn2" style={{marginLeft:550,marginTop:20}}  onClick={restartQuiz}>
+           Restart Quiz
+         </button>
+          </>
+
         ) : (
           <div className="question-card ">
             {exams.loading === false && exams.err == null && (
@@ -124,7 +133,7 @@ export function Quizh() {
                 <br />
                 <br />
                 <ReactAudioPlayer
-                  src={exams.results[currentQuestion].Audio}
+                   src={exams.results[currentQuestion].Audio}
                   
                   autoPlay
                   controls

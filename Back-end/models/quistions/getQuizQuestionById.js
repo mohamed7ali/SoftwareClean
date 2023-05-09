@@ -1,9 +1,10 @@
-const ExamQuestion = require("../../routes/examQuestions");
+const ExamQuestion = require("../../controller/quizController");
 
-async function getQuizQuestions(req, res) {
+async function getQuizQuestions(req, res,id) {
   try {
+    const id = req.params.Id;
     const examQuestion = new ExamQuestion();
-    const rows = await examQuestion.getAll();
+    const rows = await examQuestion.getById(id);
     res.json(rows);
   } catch (error) {
     console.error(error);
